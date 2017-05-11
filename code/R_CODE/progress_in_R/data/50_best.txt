@@ -1,0 +1,51 @@
+Columbia,19
+Eden Prairie,22
+Plano,42
+West Des Moines,14
+PARSIPPANY-TROY HILLS,29
+Highlands Ranch,5
+Clarkstown,31
+Weston,9
+Beaverton,36
+Naperville,12
+Woodbury,22
+Pflugerville,42
+Centennial,5
+Sammamish,46
+West Hartford,6
+Nashua,28
+Eastvale,4
+Euless,42
+Edison,29
+Irvine,4
+San Ramon,4
+Ashburn,45
+Franklin,29
+Appleton,48
+Broomfield,5
+Cherry Hill,29
+Hoffman Estates,12
+Hunter Mill,45
+Overland Park,15
+Fishers,13
+Newton,20
+Novi,21
+Koolaupoko,51
+OYSTER BAY COVE,31
+Sioux Falls,33
+Wellington,9
+Cary,32
+Hamden,6
+HUNTINGTON BAY VILLAGE,31
+Greenwich,6
+Levittown,37
+Matoaca,45
+Lees Summit,24
+Spring,42
+Central Pasco,9
+Fremont,4
+Ames,14
+Edmond,35
+WEST CHESTER TOWNSHIP,34
+Scottsdale,2
+

@@ -1,0 +1,51 @@
+Miami,9
+Detroit,21
+Paterson,29
+Hawthorne,4
+Fall River,20
+Birmingham,1
+Memphis,41
+Flint,21
+Cleveland,34
+Gary,13
+Westminster,4
+Jackson,23
+Dayton,34
+Buffalo,31
+St. Louis,24
+Canton,34
+Mount Vernon,31
+Rockford,12
+Wilmington,7
+Youngstown,34
+Albany,10
+Milwaukee,48
+Springfield,20
+Houston,42
+Camden,29
+Baltimore,19
+Lawrence,20
+Lansing,21
+Springfield,12
+Knoxville,41
+Kansas City,24
+South Bend,13
+Akron,34
+Racine,48
+Lorain,34
+Peoria,12
+Tucson,2
+Cincinnati,34
+Toledo,34
+Oakland,4
+Santa Barbara,4
+San Francisco,4
+Newark,29
+New York,31
+Davis,4
+Washington,8
+Boston,20
+Chico,4
+Palo Alto,4
+Bellingham,46
+

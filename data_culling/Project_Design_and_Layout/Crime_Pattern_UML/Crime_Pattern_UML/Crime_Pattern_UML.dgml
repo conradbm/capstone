@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DirectedGraph xmlns="http://schemas.microsoft.com/vs/2009/dgml">
+  <Nodes>
+    <Node Id="07c0fb27-4633-4641-9a18-b469e14d49571" Category="Comment" Bounds="-852.072189611025,-603.597489668247,247.74,89.8" Label="Import, clean, format, manipulate, and assess some basic statistics and charts to help understanding the data itself. This should be an exploratory anlysis phase and feature engineering phase of the process." UseManualLocation="True" />
+    <Node Id="19dde097-dc09-43c5-a4f8-ea69799a38bf1" Category="Comment" Bounds="656.258336375671,-281.494058219383,247.88,105.76" Label="Similar to the data phase, this is another necessary exploratory analysis phase to identify specific cities of interest to look for trends over time in their cluster and ranking. This may not be for one city only, but several that we want to investigate." UseManualLocation="True" />
+    <Node Id="2a826420-ec72-4730-a5d5-7fa563afbfc91" Category="Comment" Bounds="-270.162274696182,-218.731521849907,244.1,89.8" Label="Assess what changes need to made to the K-means Clustering Algorithm (Tuning parameters, e.g,... too many clusters, not enough?) need to be changed to have this make the clusters make sense." UseManualLocation="True" />
+    <Node Id="421ff9d1-6911-4416-9388-0569ed1323171" Category="Comment" Bounds="-235.789887620475,97.7800007409063,246.78,89.8" Label="Heathy Population Decay -- If a population decreases over time, the cluster ranking that the city falls into must decrease over time (e.g,.. City decays, crime patterns get more favorable)." UseManualLocation="True" />
+    <Node Id="4251d1bf-8b1a-4b65-8b04-fb193f8491591" Category="Comment" Bounds="1019.67711676543,283.048157636986,229.45,73.84" Label="If there is no population change and no crime pattern change, the city is to be considered to have experienced neither heathy growth nor heathy decay." UseManualLocation="True" />
+    <Node Id="50efec62-5b20-42a9-b07a-0fd84135de911" Category="Comment" Bounds="249.899391174316,-761.35162683821,249.216666666667,281.32" Label="Identify more favorable and less favorable crime patterns (clusters). Think of this step kind of like generating a heat map with about 15 different colors between blue and red, where blue is the most favorable crime and red is the least favorable, and there are several colors in between the two colors. This step should generate a heirarchy of crime patterns so that we can assess which cities changed over time (e.g,.. Indianapolis may be ranked in cluster 4 in 1999, but in 2014 it might be in cluster 15, we would say the ranking went up, so the crime pattern got worse, giving us one of the necessary parameters for assessing healthy growth/decay/flat population for cities over time)." UseManualLocation="True" />
+    <Node Id="58c929a8-964e-4771-bba4-9655552577e71" Category="Comment" Bounds="-279.786770963089,-697.254672503292,246.416666666667,169.6" Label="Make sure the K-means supported clusters make sense. Make sure that patterns of particular cities inside of each cluster make sense and have similar relationships to neighboring cities in their cluster. Example: Do you see Murder growth or theft decay (some pattern) amongst all of the observations in the cluster? Make sure we see clear relationships amongst the cluster before moving foward from this step." UseManualLocation="True" />
+    <Node Id="6a5327a9-bba0-48b0-9ef1-c97047f041081" Category="Comment" Bounds="89.0213583276272,302.230060336153,229.45,73.8399999999999" Label="If there is no population change and no crime pattern change, the city is to be considered to have experienced neither heathy growth nor heathy decay." UseManualLocation="True" />
+    <Node Id="6bb89467-1d25-4935-89f1-a7e92d7dd5321" Category="Comment" Bounds="-545.449726401095,-581.917033496443,228.673333333333,57.88" Label="Applied on the crime data (indices 4-15 numeric) accross all cities and years (indices 1-4 categorical)." UseManualLocation="True" />
+    <Node Id="CrimePatternAnalysisCrime(1979-2014)ProjectDesignAndLayout" Bounds="-101.769609035825,-944.374901016299,381.25,25.96" Label="Crime Pattern Analysis Crime (1979-2014) Project Design and Layout" UseManualLocation="True" />
+    <Node Id="Data" Bounds="-756.852906501838,-439.608695449298,50,25.96" UseManualLocation="True" />
+    <Node Id="HealthyGrowth:" Category="Comment" Bounds="-568.344486919151,102.440451723197,245.14,105.76" Label="Healthy Population Growth -- If a population increases over time, the cluster ranking that the city falls into must remain the same or decrease over time (e.g,.. City grows, crime patterns stay the same or get more favorable)." UseManualLocation="True" />
+    <Node Id="HeathyStaticity" Category="Comment" Bounds="78.305310876373,93.141815281316,240.686666666667,121.72" Label="Heathy Population Staticity -- If a population neither increases or decreases over time, the cluster ranking that the city falls into must decrease over time (e.g,.. City population remains the same over time, but crime patterns get more favorable)." UseManualLocation="True" />
+    <Node Id="IdentifyHealthyGrowth/decay/flat" Bounds="-265.325504471882,-41.9069166641291,314.746666666667,25.96" Label="Identify Healthy Population Growth, Decay, and Staticity" UseManualLocation="True" />
+    <Node Id="IdentifyUnhealthyPopulationGrowth,Decay,AndStaticity" Bounds="641.639342477241,-18.2038138201126,328.05,25.96" Label="Identify Unhealthy Population Growth, Decay, and Staticity" UseManualLocation="True" />
+    <Node Id="InvestigateTemporalCrimeTrendsAccrossSpecificCities" Bounds="200.971608479818,-248.180192561849,321.333333333333,25.96" Label="Investigate Temporal Crime Trends Accross Specific Cities" UseManualLocation="True" />
+    <Node Id="K-meansClusteringAlgorithm" Bounds="-516.868649437401,-439.943150024414,179.453333333333,25.96" Label="K-means Clustering Algorithm" UseManualLocation="True" />
+    <Node Id="ManuallyAssessTheClusterResults" Bounds="-259.03792766457,-439.943150024414,206.65,25.96" Label="Manually Assess the Cluster Results" UseManualLocation="True" />
+    <Node Id="No,TheClustersDoNotMakeSense." Bounds="-254.202229852517,-300.303180435524,208.2,25.96" Label="No, the clusters do not make sense." UseManualLocation="True" />
+    <Node Id="RankTheClusters" Bounds="308.207916463216,-439.900392561849,111.573333333333,25.96" Label="Rank the Clusters" UseManualLocation="True" />
+    <Node Id="UnhealthyPopulationGrowth--IfAPopulation" Category="Comment" Bounds="404.339789582491,92.2073166544444,243.823333333333,89.8" Label="Unhealthy Population Growth -- If a population increases over time, the cluster ranking that the city falls into must increase over time (e.g,.. City grows, crime patterns get less favorable)." UseManualLocation="True" />
+    <Node Id="Yes,TheClustersMakeSense." Bounds="25.215451558431,-439.043006375122,170.583333333333,25.96" Label="Yes, the clusters make sense." UseManualLocation="True" />
+    <Node Id="cec4a3d5-1dba-455a-ba55-906e3ffde16a1" Category="Comment" Bounds="697.192531560556,94.1281611560345,247.47,105.76" Label="Unhealthy Population Decay -- If a population decreases over time, the cluster ranking that the city falls into must remain the same or increase over time (e.g,.. City decays, crime patterns remain the same or get less favorable)." UseManualLocation="True" />
+    <Node Id="f13c219c-fc50-481b-a551-bc6d07b1cb7a1" Category="Comment" Bounds="1005.33978958249,104.993541593117,248.836666666667,105.76" Label="Unhealthy Population Staticity -- If a population neither increases or decreases over time, the cluster ranking that the city falls into must increase over time. (e.g,.. City population remains the same over time, but crime patterns get less favorable)." UseManualLocation="True" />
+  </Nodes>
+  <Links>
+    <Link Source="07c0fb27-4633-4641-9a18-b469e14d49571" Target="Data" Bounds="-731.245415571171,-513.797479248047,1.80208316245307,65.1922079069562" />
+    <Link Source="19dde097-dc09-43c5-a4f8-ea69799a38bf1" Target="InvestigateTemporalCrimeTrendsAccrossSpecificCities" Bounds="531.303812573871,-232.530470296168,124.954551683941,1.96618752158983" />
+    <Link Source="2a826420-ec72-4730-a5d5-7fa563afbfc91" Target="No,TheClustersDoNotMakeSense." Bounds="-149.716855357121,-265.344564303066,0.817308489182153,46.6130424531589" />
+    <Link Source="421ff9d1-6911-4416-9388-0569ed1323171" Target="IdentifyHealthyGrowth/decay/flat" Bounds="-111.236168827866,-6.94993172086769,2.71439051142595,104.729932026043" />
+    <Link Source="4251d1bf-8b1a-4b65-8b04-fb193f8491591" Target="f13c219c-fc50-481b-a551-bc6d07b1cb7a1" Bounds="1131.53088183011,219.749851450834,1.81347326799005,63.2983034563924" />
+    <Link Source="50efec62-5b20-42a9-b07a-0fd84135de911" Target="RankTheClusters" Bounds="365.186398255725,-480.031619873047,1.68975222400627,31.1444445237511" />
+    <Link Source="58c929a8-964e-4771-bba4-9655552577e71" Target="ManuallyAssessTheClusterResults" Bounds="-156.182758534011,-527.654711914063,0.367270898656159,78.7116598612744" />
+    <Link Source="6a5327a9-bba0-48b0-9ef1-c97047f041081" Target="HeathyStaticity" Bounds="200.572027412773,223.858406411428,2.15781504139289,78.3716637790016" />
+    <Link Source="6bb89467-1d25-4935-89f1-a7e92d7dd5321" Target="K-meansClusteringAlgorithm" Bounds="-430.201071195433,-524.03705078125,2.3665617163432,75.0983661930791" />
+    <Link Source="Data" Target="K-meansClusteringAlgorithm" Bounds="-706.852905273438,-426.854790412158,180.984245736739,0.198643228132312" />
+    <Link Source="HealthyGrowth:" Target="IdentifyHealthyGrowth/decay/flat" Bounds="-348.817630625596,-11.6375898994196,209.165036412571,114.078043543218" />
+    <Link Source="HeathyStaticity" Target="IdentifyHealthyGrowth/decay/flat" Bounds="-78.4679393721515,-11.3355873299818,175.111148401748,104.47740312588" />
+    <Link Source="InvestigateTemporalCrimeTrendsAccrossSpecificCities" Target="IdentifyHealthyGrowth/decay/flat" Bounds="-70.1625400233443,-222.2201953125,402.251243930446,176.693725944517" />
+    <Link Source="InvestigateTemporalCrimeTrendsAccrossSpecificCities" Target="IdentifyUnhealthyPopulationGrowth,Decay,AndStaticity" Bounds="386.699348833488,-222.2201953125,385.91220714111,199.8772064345" />
+    <Link Source="K-meansClusteringAlgorithm" Target="ManuallyAssessTheClusterResults" Bounds="-337.415331624349,-426.963150024414,69.3774028523763,0" />
+    <Link Source="ManuallyAssessTheClusterResults" Target="No,TheClustersDoNotMakeSense." Bounds="-155.191395293926,-413.983150024414,4.20630913221805,104.687224951907" />
+    <Link Source="ManuallyAssessTheClusterResults" Target="Yes,TheClustersMakeSense." Bounds="-52.3879287719726,-426.613792190799,68.6034317749016,0.231958831874238" />
+    <Link Source="No,TheClustersDoNotMakeSense." Target="K-meansClusteringAlgorithm" Bounds="-393.353423653715,-409.932254149975,217.4994282572,109.629072997631" />
+    <Link Source="RankTheClusters" Target="InvestigateTemporalCrimeTrendsAccrossSpecificCities" Bounds="361.908395134039,-413.940394897461,1.92665824493673,156.760879253715" />
+    <Link Source="UnhealthyPopulationGrowth--IfAPopulation" Target="IdentifyUnhealthyPopulationGrowth,Decay,AndStaticity" Bounds="614.395486581322,11.8412590830146,157.768085725211,80.3660521657646" />
+    <Link Source="Yes,TheClustersMakeSense." Target="RankTheClusters" Bounds="195.798784891764,-426.701263998324,103.409183051174,0.349762148738989" />
+    <Link Source="cec4a3d5-1dba-455a-ba55-906e3ffde16a1" Target="IdentifyUnhealthyPopulationGrowth,Decay,AndStaticity" Bounds="807.863604408121,16.711285783339,7.7620069583412,77.4168814835066" />
+    <Link Source="f13c219c-fc50-481b-a551-bc6d07b1cb7a1" Target="IdentifyUnhealthyPopulationGrowth,Decay,AndStaticity" Bounds="839.496532665129,11.8019387815717,185.182778790703,93.1916040040728" />
+  </Links>
+  <Categories>
+    <Category Id="Comment" Label="Comment" Description="Represents a user defined comment on the diagram" CanBeDataDriven="True" IsProviderRoot="False" NavigationActionLabel="Comments" />
+  </Categories>
+  <Properties>
+    <Property Id="Bounds" DataType="System.Windows.Rect" />
+    <Property Id="CanBeDataDriven" Label="CanBeDataDriven" Description="CanBeDataDriven" DataType="System.Boolean" />
+    <Property Id="Expression" DataType="System.String" />
+    <Property Id="GroupLabel" DataType="System.String" />
+    <Property Id="IsEnabled" DataType="System.Boolean" />
+    <Property Id="IsProviderRoot" Label="IsProviderRoot" Description="IsProviderRoot" DataType="System.Boolean" />
+    <Property Id="Label" Label="Label" Description="Displayable label of an Annotatable object" DataType="System.String" />
+    <Property Id="NavigationActionLabel" Label="NavigationActionLabel" Description="NavigationActionLabel" DataType="System.String" />
+    <Property Id="TargetType" DataType="System.Type" />
+    <Property Id="UseManualLocation" DataType="System.Boolean" />
+    <Property Id="Value" DataType="System.String" />
+    <Property Id="ValueLabel" DataType="System.String" />
+  </Properties>
+  <Styles>
+    <Style TargetType="Node" GroupLabel="Comment" ValueLabel="Has comment">
+      <Condition Expression="HasCategory('Comment')" />
+      <Setter Property="Background" Value="#FFFFFACD" />
+      <Setter Property="Stroke" Value="#FFE5C365" />
+      <Setter Property="StrokeThickness" Value="1" />
+      <Setter Property="NodeRadius" Value="2" />
+      <Setter Property="MaxWidth" Value="250" />
+    </Style>
+  </Styles>
+</DirectedGraph>

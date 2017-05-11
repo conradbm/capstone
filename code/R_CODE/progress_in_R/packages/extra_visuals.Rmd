@@ -1,0 +1,228 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+<h1> Extra Visualizations </h1>
+
+<h2>Data Analysis Outline</h2>
+```{r}
+"
+If K=3 for my Kmeans, then this is what I want:
+
+             | 1 2 3 4 5 ... 35  |   <- years as columns
+-------------|-------------------|
+small_cityA  | 1 2 1 3 1 ... 1   |   <- cluster assignments for that year
+small_cityB  | ...               |
+...48more    | ...               |
+big_cityA    | ...               |
+big_cityB    | ...               |
+...48more    | ...               |
+---------------------------------|
+""
+```
+
+
+
+<h2>Interesting how the best cities and worst cities, seem to fall into similar crime patterns.</h2>
+```{r}
+besthist <- ggplot()
+besthist <- besthist+geom_bar(data=df[which(df$city %in% best10$city),], aes(x=cluster),fill = "#70DBDB")
+besthist <- besthist+ggtitle("Best Cities in America", subtitle = c("Average Cluster Change from 1980-2014 under K-means Cluster")) 
+besthist <- besthist+theme(plot.title = element_text(face="bold", size="18"),
+                           plot.subtitle = element_text(size="12"),
+                           axis.text = element_text(family = "mono",color="gray"),
+                           axis.title.x = element_text(face="bold"),
+                           axis.title.y = element_text(face="bold"),
+                           panel.grid.major = element_line(colour="#CDCDCD"),
+                           panel.grid.minor = element_line(colour="#F0F0F0"),
+                           panel.background = element_rect(fill = "#F0F0F0"),
+                           plot.background = element_rect(fill = "#F0F0F0"),
+                           legend.position = "none")
+besthist <- besthist + ylab(label="Frequency") + xlab("City Cluster Assignment")
+besthist
+
+```
+```{r}
+worsthist <- ggplot()
+worsthist <- worsthist+geom_bar(data=df[which(df$city %in% worst10$city),], aes(x=cluster),fill = "#FF6666")
+worsthist <- worsthist+ggtitle("Worst Cities in America", subtitle = c("Average Cluster Change from 1980-2014 under K-means Cluster")) 
+worsthist <- worsthist+theme(plot.title = element_text(face="bold", size="18"),
+                           plot.subtitle = element_text(size="12"),
+                           axis.text = element_text(family = "mono",color="gray"),
+                           axis.title.x = element_text(face="bold"),
+                           axis.title.y = element_text(face="bold"),
+                           panel.grid.major = element_line(colour="#CDCDCD"),
+                           panel.grid.minor = element_line(colour="#F0F0F0"),
+                           panel.background = element_rect(fill = "#F0F0F0"),
+                           plot.background = element_rect(fill = "#F0F0F0"),
+                           legend.position = "none")
+worsthist <- worsthist + ylab(label="Frequency") + xlab("City Cluster Assignment")
+worsthist
+```
+
+<h2>Get statistics for the simple plots</h2>
+```{r}
+
+library(plyr)
+
+best10 <- df_best[1:10,]
+worst10 <- df_worst[1:10,]
+
+clstCts <- count(df[which(df$city %in% best10$city),], c("cluster"))
+clstCts2 <- count(df[which(df$city %in% worst10$city),], c("cluster"))
+m1 <- as.matrix(clstCts)
+m2 <- as.matrix(clstCts2[c(1:3,5:7),])
+abs(m1[,2] - m2[,2])
+```
+
+<h2>Make a plot to show 2 stacked scatter plots of crime for top 10 best top 10 worst</h2>
+```{r}
+b <- df_best[,c("city","state")]
+b <- b[1:20,]
+
+b$included_a1 <- TRUE
+df$included_a2 <- TRUE
+res <- merge(df,b,all=TRUE)
+res <- res[which(!is.na(res$included_a1) & !is.na(res$included_a2)),]
+res <- res[,1:15]
+df_found_good <- b[which((unique(b$city) %in% unique(res$city))),]
+df_notfound_good <- b[which(!(unique(b$city) %in% unique(res$city))),] 
+
+w <- df_worst[,c("city","state")]
+w <- w[1:20,]
+w$included_a1 <- TRUE
+df$included_a2 <- TRUE
+res2 <- merge(df,w,all=TRUE)
+res2 <- res2[which(!is.na(res2$included_a1) & !is.na(res2$included_a2)),]
+res2 <- res2[,1:15]
+df_found_bad <- w[which((unique(w$city) %in% unique(res2$city))),c(1,2)]
+df_notfound_bad <- w[which(!(unique(w$city) %in% unique(res2$city))),c(1,2)]
+
+```
+
+
+
+```{r}
+
+newdata <- res2[order(as.numeric(res$state), res$year),]
+
+newdata <- newdata[which(newdata$city %in% unique(newdata$city)[1:10]),] # Just to get the top 6 to match
+newdata$year <- newdata$year + 1978
+
+p<- ggplot (data=newdata, aes(x=year, y=murder, color=city)) +
+  geom_line() + 
+  ggtitle("10 Worst Cities to Live", 
+              subtitle = c("FBI Annual Crime Data from 1979 - 2014"))
+
+p <- p + xlab(label="Year (1979 - 2014)")+
+          ylab(label="Annual Murder") +
+          theme(plot.title = element_text(face="bold",size="18"),
+                       plot.subtitle = element_text(size="12"),
+                       axis.text = element_text(family = "mono",color="gray"),
+                       axis.title.x = element_text(face="bold"),
+                       axis.title.y = element_text(face="bold"),
+                       panel.grid.major = element_line(colour="#CDCDCD"),
+                       panel.grid.minor = element_line(colour="#F0F0F0"),
+                       panel.background = element_rect(fill = "#F0F0F0"),
+                       plot.background = element_rect(fill = "#F0F0F0"),
+                legend.background = element_rect(fill = "#F0F0F0"))
+
+p<- p + theme(plot.title = element_text(face="bold",size="18"),
+               plot.subtitle = element_text(size="12"),
+               axis.text = element_text(family = "mono",color="gray"),
+               axis.title.x = element_text(face="bold"),
+               axis.title.y = element_text(face="bold"),
+               panel.grid.major = element_line(colour="#CDCDCD"),
+               panel.grid.minor = element_line(colour="#F0F0F0"),
+               panel.background = element_rect(fill = "#F0F0F0"),
+               plot.background = element_rect(fill = "#F0F0F0"))
+
+abbrev_x <- c("1979","'84","'89","'94","'99","'04","'09","'14")
+
+p<- p + scale_x_continuous(limits = c(1979,2014),
+                           breaks = c(seq(1979,2014,by=5)),
+                           labels=abbrev_x)
+p
+```
+
+```{r}
+newdata <- res[order(as.numeric(res$state), res$year),]
+
+newdata <- newdata[which(newdata$city %in% unique(newdata$city)[1:10]),] # Just to get the top 6 to match
+newdata$year <- newdata$year + 1978
+
+p<- ggplot (data=newdata, aes(x=year, y=murder, color=city)) +
+  geom_line() + 
+  ggtitle("10 Best Cities to Live", 
+              subtitle = c("FBI Annual Crime Data from 1979 - 2014"))
+
+p <- p + xlab(label="Year (1979 - 2014)")+
+          ylab(label="Annual Murder") +
+          theme(plot.title = element_text(face="bold",size="18"),
+                       plot.subtitle = element_text(size="12"),
+                       axis.text = element_text(family = "mono",color="gray"),
+                       axis.title.x = element_text(face="bold"),
+                       axis.title.y = element_text(face="bold"),
+                       panel.grid.major = element_line(colour="#CDCDCD"),
+                       panel.grid.minor = element_line(colour="#F0F0F0"),
+                       panel.background = element_rect(fill = "#F0F0F0"),
+                       plot.background = element_rect(fill = "#F0F0F0"),
+                legend.background = element_rect(fill = "#F0F0F0"))
+
+p<- p + theme(plot.title = element_text(face="bold",size="18"),
+               plot.subtitle = element_text(size="12"),
+               axis.text = element_text(family = "mono",color="gray"),
+               axis.title.x = element_text(face="bold"),
+               axis.title.y = element_text(face="bold"),
+               panel.grid.major = element_line(colour="#CDCDCD"),
+               panel.grid.minor = element_line(colour="#F0F0F0"),
+               panel.background = element_rect(fill = "#F0F0F0"),
+               plot.background = element_rect(fill = "#F0F0F0"))
+
+abbrev_x <- c("1979","'84","'89","'94","'99","'04","'09","'14")
+
+p<- p + scale_x_continuous(limits = c(1979,2014),
+                           breaks = c(seq(1979,2014,by=5)),
+                           labels=abbrev_x)
+p
+```
+
+
+
+
+
+
+<br><br>
+<h3> Apply PCA to reduce our data to 2 dimensions (for visualization purposes) </h3>
+```{r}
+df[,5:ncol(df)] <- scale(df[,5:ncol(df)],center=TRUE)
+pca <- prcomp(df[,4:ncol(df)])
+df$PCA1 <- pca$x[,1]
+df$PCA2 <- pca$x[,2]
+head(df[,c("PCA1","PCA2")])
+```
+
+
+
+
+<br><br>
+<h3> Visualize the K-means and PCA (Population Not included) </h3>
+```{r}
+# Make sure that centered with pop is correct
+pltClusters <- ggplot(df, aes(x=log(PCA1+1), y=log(PCA2+1), color=cluster)) + geom_point()
+pltClusters <- pltClusters + scale_colour_gradient(limits=c(1, 30), low="green", high="red")
+pltClusters <- pltClusters + ggtitle("Reduced dimensions visualization of K-means", subtitle="Colored by Cluster | K=30 | Centered Data Matrix | Population Included")
+pltClusters <- pltClusters + theme(plot.title = element_text(size = rel(2.0)))
+pltClusters <- pltClusters + geom_hline(aes(yintercept=0), colour="blue", linetype="dotted")
+pltClusters <- pltClusters + geom_vline(aes(xintercept=0), colour="blue", linetype="dotted")
+#pltClusters <- pltClusters + geom_abline(intercept=-1.75, slope=-4)
+pltClusters <- pltClusters + theme(panel.background = element_rect(fill = "#F0F0F0"),
+                                   plot.background = element_rect(fill = "#F0F0F0"),
+                                   legend.background = element_rect(fill = "#F0F0F0"),
+                                   legend.position = c(0.95, 0.1),
+                                   panel.grid.major = element_blank(),
+                                   panel.grid.minor = element_blank())
+pltClusters
+```
+

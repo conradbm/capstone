@@ -1,0 +1,30 @@
+MEANS AFTER NORMALIZATION
+
+murder                     manslaughter               rapetotal                   
+roberytotal                 assaulttotal 
+2.651504e-17           -1.530044e-17           -7.411396e-17            
+1.835335e-17            1.138675e-17 
+
+
+burglarytotal               larcenytotal               autotheft                    
+numberOfficersKilled 
+-1.034802e-17            1.612143e-18           -2.352942e-18            
+3.542058e-18
+
+numberOfficersAssaulted
+-8.083753e-19 
+
+
+STANDARD DEVIATIONS AFTER NORMALIZATION
+
+murder            manslaughter               rapetotal             
+roberytotal            assaulttotal 
+                      1                       1                       1                       
+1                       1 
+burglarytotal            larcenytotal               autotheft    
+numberOfficersKilled 
+                      1                       1                       1                       
+1                       
+numberOfficersAssaulted
+1
+

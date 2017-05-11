@@ -1,0 +1,625 @@
+---
+title: "Blake Conrad's Capstone Project"
+output: html_notebook
+---
+<br><br>
+
+
+<h3>Libraries</h3>
+```{r}
+library(ggplot2)
+library(plotly)
+library(plotly)
+library(tidyr)
+library(caret)
+library(grid)
+
+setwd("/Users/bmc/Desktop/CSCI-49500/THE_QUEST___Progress_Folder/progress_in_R")
+source("/Users/bmc/Desktop/CSCI-49500/THE_QUEST___Progress_Folder/progress_in_R/packages/functions.R")
+source("/Users/bmc/Desktop/CSCI-49500/THE_QUEST___Progress_Folder/progress_in_R/packages/constants.R")
+```
+<br><br>
+
+<h3> Import the data </h3>
+<ul> <li>Clean the data </li> </ul>
+```{r}
+df <- read.csv("data/CulledData.csv", header=TRUE)
+
+#df <- df[which((df$state %in% c(1:51))),]
+
+df[,5:ncol(df)] <- scale(df[,5:ncol(df)], center=TRUE, scale=TRUE)
+df$city <- as.character(df$city)
+df$state <- as.character(df$state)
+
+df[which(df$city == "TAVISTOCK"),]
+df[which(df$city == "TAVISTOCK BOROUGH"),"city"] <- "TAVISTOCK"
+
+# Cluster with K=10, our best purity index score
+set.seed(12345)
+cluster <- kmeans(df[,5:14], centers=10, nstart=30)
+df$cluster <- cluster$cluster
+df$agg <- apply(df[,5:14], 1, sum)
+
+#update constants
+DF_ALL_DATA_ORIGINAL <- df
+head(df)
+```
+<br><br>
+
+
+<h2>Read in 50 best cities to live in</h2>
+<p>http://time.com/money/collection/best-places-to-live/</p>
+```{r}
+df_best <- read.csv("data/50_best.txt", header=FALSE, col.names = c("city","state"))
+df_best$city <- toupper(as.character(df_best$city))
+df_best$state <- gsub('\\s+', '', df_best$state)
+
+#update constants
+DF_UNIQUE_BEST_CITY_STATE <- df_best
+head(DF_UNIQUE_BEST_CITY_STATE)
+```
+<br><br>
+
+
+<h2>Read in 50 worst cities to live in</h2>
+<p>http://247wallst.com/special-report/2016/06/28/the-worst-cities-to-live-in/11/</p>
+```{r}
+df_worst <- read.csv("data/50_worst.txt", header=FALSE, col.names = c("city","state"))
+df_worst$city <- toupper(as.character(df_worst$city))
+df_worst$state <- gsub('\\s+', '', df_worst$state)
+
+#update constants
+DF_UNIQUE_WORST_CITY_STATE <- df_worst
+head(DF_UNIQUE_WORST_CITY_STATE)
+```
+<br><br>
+
+
+
+
+<h3> Get the list of all unique cities </h3>
+```{r}
+# Get cities in ascending order
+df_sorted_asc <- df[with(df, order(population)), ]
+df_sorted_asc$city <- as.character(df_sorted_asc$city)
+df_sorted_asc$year <- as.numeric(df_sorted_asc$year)
+df_sorted_asc$state <- as.character(df_sorted_asc$state)
+x <- unique(as.data.frame(t(apply(df_sorted_asc[,c("city","state")], 1, sort))));
+x <- x[,c(2,1)]
+x$city <- as.character(x$city)
+x$state <- as.character(x$state)
+smallest50_citystate <- x[1:50,]
+largest50_citystate <-  x[nrow(x):(nrow(x)-49),]
+smallest50_citystate <- smallest50_citystate[,c(2,1)]
+largest50_citystate <- largest50_citystate[,c(2,1)]
+
+#update constants
+DF_ALL_UNIQUE_CITY_STATES <- x
+
+head(DF_ALL_UNIQUE_CITY_STATES)
+
+```
+<br><br>
+
+
+<h3>The following is based off the purity score ranking clusters into 1 of the 2 groups, i.e,. good or bad.</h3>
+```{r}
+##################################################################
+#% % % %
+#% The following tells us which clusters were the 
+#% best and worst dominated.
+#% A =
+#%      2     0   501    81   365     0     0     0    39     0
+#%     34   257   201   237    28   686    55     1   170    19
+#%
+#% Bad Crime Clusters = {1,2,4,6,7,8,9,10}
+#% Good Crime Clusters = {3,5}
+##################################################################
+
+
+
+df.list <- getListOfCityDataFrames(x,df)
+
+LIST_UNIQUE_BEST_CLUSTERS <- c(3,5)
+LIST_UNIQUE_WORST_CLUSTERS <- c(1,2,4,6,7,8,9,10)
+
+unique_2014above50K <- find2014Above50K(df.list)
+df.list.2014above50k <- getListOfCityDataFrames( unique_2014above50K, df)
+
+df_city_aypi = getAYPI(df.list.2014above50k)
+df_city_aypi$bin <- as.factor(df_city_aypi$bin)
+df_city_aypi$below0 <- df_city_aypi$aypi < 0
+df_city_aypi$above0 <- df_city_aypi$aypi >0
+df_city_aypi
+
+library(ggplot2)
+
+plt <- ggplot() + geom_histogram(data=df_city_aypi, aes(x=aypi, fill=factor(below0, labels=c("Increasing", "Decreasing"))), binwidth = 0.001)
+plt <- plt +  ggtitle("Average Yearly Population Increase", subtitle="All cities whose populated was or exceeded 50,000 in 2014")
+plt <- plt + theme(plot.title = element_text(face="bold",size="18"),
+                   plot.subtitle = element_text(size="10"),
+                   axis.text = element_text(family = "mono",color="black"),
+                   axis.title.x = element_text(face="bold"),
+                   axis.title.y = element_text(face="bold"),
+                   panel.grid.major = element_line(colour="#CDCDCD"),
+                   panel.grid.minor = element_line(colour="#F0F0F0"),
+                   panel.background = element_rect(fill = "#F0F0F0"),
+                   plot.background = element_rect(fill = "#F0F0F0"),
+                   legend.background = element_rect(fill = "#F0F0F0"))
+plt <- plt + guides(fill=guide_legend(title="AYPI"))
+plt
+#hist(df_city_aypi$bin)
+
+
+```
+
+```{r}
+
+G1 <- getListOfCityDataFrames( df_city_aypi[which(df_city_aypi$below == FALSE),c("city","state")], df)
+G2 <- getListOfCityDataFrames( df_city_aypi[which(df_city_aypi$below == TRUE),c("city","state")], df)
+
+
+# Make a big data frame object using rbind to hold all of cluster 1 hits for all cities
+G1[[1]][which(G1[[1]]$cluster==4),]
+G2[[1]][which(G2[[1]]$cluster == 8),]
+
+
+g <- function(G2){
+  
+  df_G2 <- data.frame(city=c(),
+                    state=c(),
+                    year=c(),
+                    population=c(),
+                    murder=c(),
+                    manslaughter=c(),
+                    rapetotal=c(),
+                    roberytotal=c(),
+                    assaulttotal=c(),
+                    burglarytotal=c(),
+                    larcenytotal=c(),
+                    autotheft=c(),
+                    numOfficersKilled=c(),
+                    numOfficersAssaulted=c(),
+                    cluster=c())
+  
+  for(i in 1:length(G2)){
+    df_G2 <- rbind(df_G2, G2[[i]])
+  }
+  return(df_G2)
+}
+
+g1 <- function(G1){
+  
+  df_G1 <- data.frame(city=c(),
+                    state=c(),
+                    year=c(),
+                    population=c(),
+                    murder=c(),
+                    manslaughter=c(),
+                    rapetotal=c(),
+                    roberytotal=c(),
+                    assaulttotal=c(),
+                    burglarytotal=c(),
+                    larcenytotal=c(),
+                    autotheft=c(),
+                    numOfficersKilled=c(),
+                    numOfficersAssaulted=c(),
+                    cluster=c())
+  
+  for(i in 1:length(G1)){
+    df_G1 <- rbind(df_G1, G1[[i]])
+  }
+  return(df_G1)
+}
+
+df_G1 <- g1(G1)
+df_G2 <- g(G2)
+
+h <- function(df_g, i){
+
+  
+        meanStats <- data.frame(murder=c(),
+                                manslaughter=c(),
+                                rapetotal=c(),
+                                roberytotal=c(),
+                                assaulttotal=c(),
+                                burglarytotal=c(),
+                                larcenytotal=c(),
+                                autotheft=c(),
+                                numOfficersKilled=c(),
+                                numOfficersAssaulted=c(),
+                                cluster=c(),
+                                year=c())
+                            
+    for(j in 1:35){
+        
+        year_j_meanStats <- apply(df_g[which(df_g$cluster == i & df_g$year == j),c(5:14)], 2, mean)
+        year_j_meanStats$cluster=i
+        year_j_meanStats$year=j
+        meanStats <- rbind(meanStats, year_j_meanStats)
+      }
+   
+  
+  return(meanStats)
+}
+
+L <- h(df_G1, 1)
+L <- rbind(L, h(df_G1, 2))
+L <- rbind(L, h(df_G1, 3))
+L <- rbind(L, h(df_G1, 4))
+L <- rbind(L, h(df_G1, 5))
+L <- rbind(L, h(df_G1, 6))
+L <- rbind(L, h(df_G1, 7))
+L <- rbind(L, h(df_G1, 8))
+L <- rbind(L, h(df_G1, 9))
+L <- rbind(L, h(df_G1, 10))
+
+
+
+plt <- ggplot()
+plt <- plt + geom_line(data=L, aes(x=year, y=murder, color="Death Based Crime"))
+
+plt <- plt + geom_line(data=L, aes(x=year, y=manslaughter, color="Death Based Crime"))
+plt <- plt + geom_line(data=L, aes(x=year, y=numOfficersKilled, color="Death Based Crime"))
+plt <- plt + geom_line(data=L, aes(x=year, y=roberytotal,color="Theft Based Crime") )
+plt <- plt + geom_line(data=L, aes(x=year, y=burglarytotal,color="Theft Based Crime"))
+plt <- plt + geom_line(data=L, aes(x=year, y=larcenytotal,color="Theft Based Crime"))
+plt <- plt + geom_line(data=L, aes(x=year, y=autotheft,color="Theft Based Crime"))
+plt <- plt + geom_line(data=L, aes(x=year, y=assulttotal,color="Assault Based Crime"))
+plt <- plt + geom_line(data=L, aes(x=year, y=numOfficersAssaulted,color="Assault Based Crime"))
+plt <- plt + geom_line(data=L, aes(x=year, y=rapetotal,color="Assault Based Crime"))
+
+plt <- plt + facet_wrap(~cluster) + ylim(c(0,2.5)) + xlim(c(0,35))
+plt <- plt +  ggtitle("Cluster Crime Report of Population Increasing Cities", subtitle="All cities whose populated was or exceeded 50,000 in 2014")
+plt <- plt + theme(plot.title = element_text(face="bold",size="18"),
+                   plot.subtitle = element_text(size="10"),
+                   axis.text = element_text(family = "mono",color="black"),
+                   axis.title.x = element_text(face="bold"),
+                   axis.title.y = element_text(face="bold"),
+                   axis.text.x = element_text(size="8"),
+                   panel.grid.major = element_line(colour="#CDCDCD"),
+                   panel.grid.minor = element_line(colour="#F0F0F0"),
+                   panel.background = element_rect(fill = "#F0F0F0"),
+                   plot.background = element_rect(fill = "#F0F0F0"),
+                   legend.background = element_rect(fill = "#F0F0F0"),
+                   legend.title = element_text(face="bold",size="16"),
+                   legend.text = element_text(size="12"))
+plt <- plt + xlab("Each Years Average Crime From 1979 to 2014")
+plt <- plt + ylab("Crime Total")
+plt <- plt + labs(color = "Crime Types")
+
+
+abbrev_x <- c("1979","'84","'89","'94","'99","'04","'09","'14")
+plt<- plt + scale_x_continuous(breaks = c(seq(0,35,by=5)), labels=abbrev_x)
+plt <- plt + theme(axis.text.x = element_text(angle = 70, hjust = 1))
+
+plt <- plt + theme(panel.spacing = unit(1, "lines"))
+plt
+
+```
+```{r}
+library(ggplot2)
+plt2 <- ggplot()
+plt2 <- plt2 + geom_line(data=R, aes(x=year, y=murder, color="Death Based Crime"))
+plt2 <- plt2 + geom_line(data=R, aes(x=year, y=manslaughter, color="Death Based Crime"))
+plt2 <- plt2 + geom_line(data=R, aes(x=year, y=numOfficersKilled, color="Death Based Crime"))
+plt2 <- plt2 + geom_line(data=R, aes(x=year, y=roberytotal,color="Theft Based Crime") )
+plt2 <- plt2 + geom_line(data=R, aes(x=year, y=burglarytotal,color="Theft Based Crime"))
+plt2 <- plt2 + geom_line(data=R, aes(x=year, y=larcenytotal,color="Theft Based Crime"))
+plt2 <- plt2 + geom_line(data=R, aes(x=year, y=autotheft,color="Theft Based Crime"))
+plt2 <- plt2 + geom_line(data=R, aes(x=year, y=assulttotal,color="Assault Based Crime"))
+plt2 <- plt2+ geom_line(data=R, aes(x=year, y=numOfficersAssaulted,color="Assault Based Crime"))
+plt2 <- plt2 + geom_line(data=R, aes(x=year, y=rapetotal,color="Assault Based Crime"))
+plt2 <- plt2 + facet_wrap(~cluster) + ylim(c(0,2.5)) + xlim(c(0,35))
+plt2 <- plt2 +  ggtitle("Cluster Crime Report of Population Decreasing Cities", subtitle="All cities whose populated was or exceeded 50,000 in 2014")
+plt2 <- plt2 + theme(plot.title = element_text(face="bold",size="18"),
+                   plot.subtitle = element_text(size="10"),
+                   axis.text = element_text(family = "mono",color="black"),
+                   axis.title.x = element_text(face="bold"),
+                   axis.title.y = element_text(face="bold"),
+                   axis.text.x = element_text(size="8"),
+                   panel.grid.major = element_line(colour="#CDCDCD"),
+                   panel.grid.minor = element_line(colour="#F0F0F0"),
+                   panel.background = element_rect(fill = "#F0F0F0"),
+                   plot.background = element_rect(fill = "#F0F0F0"),
+                   legend.background = element_rect(fill = "#F0F0F0"),
+                   legend.title = element_text(face="bold",size="16"),
+                   legend.text = element_text(size="12"))
+plt2 <- plt2 + xlab("Each Years Average Crime From 1979 to 2014")
+plt2 <- plt2 + ylab("Crime Total")
+plt2 <- plt2 + labs(color = "Crime Types")
+
+
+abbrev_x <- c("1979","'84","'89","'94","'99","'04","'09","'14")
+plt2<- plt2 + scale_x_continuous(breaks = c(seq(0,35,by=5)), labels=abbrev_x)
+plt2 <- plt2 + theme(axis.text.x = element_text(angle = 70, hjust = 1))
+
+plt2 <- plt2 + theme(panel.spacing = unit(1, "lines"))
+plt2
+
+
+
+plt2
+
+```
+
+
+```{r}
+# Group analysis
+
+# Positively growing cities
+numGrowers <- nrow(df_city_aypi[df_city_aypi$below0 == FALSE,])
+
+# 10% or less average growth cities
+numShrinkers <- nrow(df_city_aypi[df_city_aypi$below0 == TRUE,])
+
+cat(numGrowers,"\t",numShrinkers)
+plt <- ggplot() + geom_bar(data=df_city_aypi, aes(x=factor(below0), fill=below0)) + ggtitle("Increasing and Decreasing AYPI's",subtitle="All cities whose populated was or exceeded 50,000 in 2014") + xlab("Bins") + ylab("Frequency")
+
+plt <- plt + theme(plot.title = element_text(face="bold",size="18"),
+                   plot.subtitle = element_text(size="10"),
+                   axis.text = element_text(family = "mono",color="black"),
+                   axis.title.x = element_text(face="bold"),
+                   axis.title.y = element_text(face="bold"),
+                   panel.grid.major = element_line(colour="#CDCDCD"),
+                   panel.grid.minor = element_line(colour="#F0F0F0"),
+                   panel.background = element_rect(fill = "#F0F0F0"),
+                   plot.background = element_rect(fill = "#F0F0F0"),
+                   legend.background = element_rect(fill = "#F0F0F0"))
+plt <- plt + guides(fill=guide_legend(title="AYPI Below Zero"))
+
+abbrev_x <- c("Avg Year Population Increasing", "Avg Year Population Decreasing")
+plt<- plt + scale_x_discrete(breaks = c(0,1), labels=abbrev_x)
+
+
+plt
+```
+
+
+
+
+
+```{r}
+# GET DF LIST
+df_5p_10p <- df_city_aypi[which(df_city_aypi$aypi>= 0.05 & df_city_aypi$aypi <= 0.1),]
+
+# GET INDIANA, CALI
+df_list_indiana <- getListOfCityDataFrames(df_5p_10p[which(df_5p_10p$state == 13), c("city","state")], df)
+df_list_cali <- getListOfCityDataFrames(df_5p_10p[which(df_5p_10p$state == 04),c("city","state")],df)
+df_list_florida <- getListOfCityDataFrames(df_5p_10p[which(df_5p_10p$state == 09),c("city","state")],df)
+
+# PLOT INDIANA
+plt_carmel <- ggplot() + geom_line(data=df_list_indiana[[1]], aes(x=year, y=population, color=cluster))
+
+
+plt_carmel <- plt_carmel +  ggtitle("Carmel, Indiana", subtitle="Population from 1979 to 2014 with no cluster change.")
+plt_carmel <- plt_carmel + theme(plot.title = element_text(face="bold",size="18"),
+                   plot.subtitle = element_text(size="10"),
+                   axis.text = element_text(family = "mono",color="black"),
+                   axis.title.x = element_text(face="bold"),
+                   axis.title.y = element_text(face="bold"),
+                   panel.grid.major = element_line(colour="#CDCDCD"),
+                   panel.grid.minor = element_line(colour="#F0F0F0"),
+                   panel.background = element_rect(fill = "#F0F0F0"),
+                   plot.background = element_rect(fill = "#F0F0F0"),
+                   legend.background = element_rect(fill = "#F0F0F0"))
+plt_carmel <- plt_carmel + guides(fill=guide_legend(title="AYPI"))
+abbrev_x <- c("1979","'84","'89","'94","'99","'04","'09","'14")
+plt_carmel<- plt_carmel + scale_x_continuous(breaks = c(seq(0,35,by=5)), labels=abbrev_x)
+plt_carmel <- plt_carmel + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+plt_carmel
+
+
+# PLOT INDIANA
+plt_fishers <- ggplot() + geom_line(data=df_list_indiana[[2]], aes(x=year, y=population, color=cluster))
+
+
+plt_fishers <- plt_fishers +  ggtitle("Fishers, Indiana", subtitle="Population from 1979 to 2014 with no cluster change.")
+plt_fishers <- plt_fishers + theme(plot.title = element_text(face="bold",size="18"),
+                   plot.subtitle = element_text(size="10"),
+                   axis.text = element_text(family = "mono",color="black"),
+                   axis.title.x = element_text(face="bold"),
+                   axis.title.y = element_text(face="bold"),
+                   panel.grid.major = element_line(colour="#CDCDCD"),
+                   panel.grid.minor = element_line(colour="#F0F0F0"),
+                   panel.background = element_rect(fill = "#F0F0F0"),
+                   plot.background = element_rect(fill = "#F0F0F0"),
+                   legend.background = element_rect(fill = "#F0F0F0"))
+plt_fishers <- plt_fishers + guides(fill=guide_legend(title="AYPI"))
+abbrev_x <- c("1979","'84","'89","'94","'99","'04","'09","'14")
+plt_fishers<- plt_fishers + scale_x_continuous(breaks = c(seq(0,35,by=5)), labels=abbrev_x)
+plt_fishers <- plt_fishers + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+plt_fishers
+
+
+# almost all bad increasers: 3,4
+# good turned bad: 1,2,6,8,9,10,11,12
+# bad turned good: 7
+# almost all good increasers: 5
+
+stu <- ggplot() + geom_line(data=df_list_cali[[1]], aes(x=year, y=population, color=as.factor(cluster))) + scale_colour_manual(values = c("red", "blue", "green", "black"))
+stu <- stu + geom_line(data=df_list_cali[[2]], aes(x=year, y=population, color=as.factor(cluster))) + scale_colour_manual(values = c("red", "blue", "green", "black"))
+stu <- stu + geom_line(data=df_list_cali[[3]], aes(x=year, y=population, color=as.factor(cluster))) + scale_colour_manual(values = c("red", "blue", "green", "black"))
+stu <- stu + guides(fill=guide_legend(title="Crime Patterns"))
+stu
+df_list_cali[[9]][,c("cluster")]
+df_list_cali[[11]]
+
+plot_all_unique_cities(df_5p_10p[which(df_5p_10p$state == 04),c("city","state")],df)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h1>Find correlations between our two groups</h1>
+```{r}
+# plot the cities in G2 -- look for similarities
+
+# plot the cities in G2
+
+# Consider looking into why most cities whose population at 2014 of greater than 50K found themselves in the condition of mostly "growing". Another thought is, why are the ones that decreased so small, such that it is severally insignificant to the growers.
+```
+
+
+
+
+## Now that I've got each cities aypi
+<ul>
+<li>Group 1: aypi > 1</li>
+<li>Group 2: aypi < -1</li>
+<li>Group 3: else</li>
+<li>When graphing Group 1, consider looking for the following:
+<ul><li> How many times did these populations fall into 3,5 and count per city. Analyze the results for cities doing similar things.</li> <li>Quarterly, which cities contained a 'mode' of good? Which bad?</li> <li>Calculate the average change in cluster from minYear->2014 for each city to see which clusters on average changed about the same. These could be target cities to explain why they behaved this way.</li></ul>
+</li>
+<li></li>
+<li></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+
+zz <- function(df.list.b){
+
+     df_year_pop <- df.list.b[[3]][order(-df.list.b[[3]][,"population"]),c("year","population")]
+     tmp=0
+     n = (nrow(df_year_pop)-1)
+     
+     cat("MURRIETA\nEach Step\n")
+     for(j in 1:n){ #execute equation
+          tmp = tmp + (df_year_pop[j,"population"] - df_year_pop[j+1,"population"] ) / df_year_pop[j+1,"population"] 
+          cat("i:\t", j, "\tsum:\t",tmp,"\n")
+     }
+     tmp = (tmp / n)
+     cat(tmp,"/", n,":\t", tmp,"\n")
+
+}
+
+zz(df.list.2014above50k)
+
+silly <- function( df.list.a){
+  plt <- ggplot()
+  for(i in 1:length(df.list.a)){
+    plt <- plt + geom_line(data=df.list.a[[i]], aes(x=year, y=cluster, color=city))
+    
+  }
+  plt <- plt + geom_hline(yintercept=c(3,5), linetype="dotted", color="blue")
+  return(ggplotly(plt))
+}
+
+silly(df.list.2014aboveMinBelow10K)
+
+
+plt <- ggplot() + geom_line(data=df.list.2014aboveMinBelow10K[[1]], aes(x=year, y=cluster, color=city))
+plt <- plt + geom_line(data=df.list.2014aboveMinBelow10K[[2]], aes(x=year, y=cluster, color=city))
+plt <- plt + geom_line(data=df.list.2014aboveMinBelow10K[[3]], aes(x=year, y=cluster, color=city))
+plt <- plt + geom_hline(yintercept=c(3,5), linetype="dotted", color="blue")
+plt <- plt + ggtitle("Cities With Initial Population Below 10K and Final Population Above 50K")
+plt <- ggplotly(plt)
+plt
+```
+
+
+```{r}
+# G3 -- no results
+df.list.1979above50k <- getListOfCityDataFrames( find1979Above50K(df.list), df)
+df.list.1979above50k.2014below10k <- getListOfCityDataFrames( find2014Below10K(df.list.1979above50k), df)
+df.list.1979above50k.2014below10k
+
+
+# G2
+unique_stags <- find1979to2014Stagnants(df.list)
+df.list.1979to2014Stagnant <- getListOfCityDataFrames( unique_stags, df)
+
+plot_all_unique_cities(unique_stags, df)
+```
+
+
+
+<h3> The following is a prototype, to find the patterns based on unique clusters </h3>
+ <h4>However, the worst ones may act either way, so just remove the best patterns from them</h4>
+
+<ul>
+<li>Best clusters were 6 and 8 </li>
+<li>Worst clusters were 1,2,6 and 8. The 6,8 landing in the worst could mean some of those cities are having better crime patterns. </li>
+<li>Note: 3,4,5,7,9,10 are unclassified, we can determine this by looking at how one changed from 1,2 to 6,8</li>
+<li>So my goal is to find all cities whose clusters changed from either 6,8 to 1,2 or 1,2 to 6,8</li>
+
+<li>There are ~14,000 unique city-states in the data set, df.list represents a data.frame for each</li>
+<li> There are ~4,000 of those unique city-states that have both good and bad crime patterns</li>
+
+
+<li style="color:blue;"> Cities that had similar crime patterns when they were small cities (population <10-20K) but they had different crime patterns as they grow. One inherited a desirable crime pattern whereas the other one undesirable.</li> 
+
+<li style="color:blue;"> For stable cities (populated cities) we can find out how their crime pattern changes over time. Are they getting worse or better? Which cities are doing better?</li> 
+
+<li style="color:blue;"> Are there small cities that share crime pattern of larger cities with bad crime patterns?</li> 
+<li style="color:blue;"> Are there big cities that share the crime pattern of smaller cities with good crime patterns?</li> 
+
+
+</ul>
+```{r}
+
+df.list <- getListOfCityDataFrames(DF_ALL_UNIQUE_CITY_STATES,
+                                   DF_ALL_DATA_ORIGINAL)
+
+
+uc_best <- get_best_unique_clusters(df_best, df)
+uc_worst <- get_worst_unique_clusters(df_worst, df)
+LIST_UNIQUE_BEST_CITIES <- uc_best
+LIST_UNIQUE_WORST_CITIES <- setdiff(uc_worst,uc_best)
+
+#df_unique_crime_changers <- getCrimeChangers(LIST_UNIQUE_BEST_CITIES, LIST_UNIQUE_WORST_CITIES, df.list)
+
+df.list.crime.changers <- getListOfCityDataFrames(df_unique_crime_changers,df)
+
+df_increasing_city_state <- getPopulationChangersIncreasing(df.list.crime.changers, 20000)
+#df_decreasing_city_state <- getPopulationChangersDecreasing(df.list.crime.changers, 20000)
+#df_stagnant_city_state <- getPopulationStagnant(LIST_EACH_ITEM_AS_DF_CRIME_CHANGERS)
+
+
+# What types of cities find themselves in these groups?
+df_increasing_worse_city_state <- getBadGrowth(df_increasing_city_state, df)
+
+# BUG --- The coloring for the plot is not as expected ...
+df_increasing_best_city_state <- getGoodGrowth(df_increasing_city_state, df)
+
+
+# ----> df_increasing_better_city_state <- getGoodGrowth(df_increasing_city_state, df)     <-----
+# ----> df_decreasing_worse_city_state  <- getBadDecay(df_decreasing_city_state, df)       <-----
+# ----> df_decreasing_better_city_state <- getGoodDecay(df_decreasing_city_state, df)       <-----
+# ----> df_stagnant_better_city_state   <- getGoodStagnancy(df_decreasing_city_state, df)  <-----
+# ----> df_stagnant_worse_city_state    <- getBadStagnancy(df_decreasing_city_state, df)   <-----
+
+
+```
+
